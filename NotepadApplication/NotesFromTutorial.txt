@@ -1,0 +1,38 @@
+add validation layer to text field
+-wrap body within form widget
+convert textField to formField and add validation layer as validator
+
+
+Product:
+product_name
+pid
+brand
+available_sizes
+
+Site_product:
+product_name
+site_name
+site_link
+pid
+site_price
+available_sizes
+brand
+
+Stockx_product:
+product_name
+pid
+retail_price
+available_sizes
+brand
+available_bids
+last_sales
+highest_bid
+
+Output_product:
+product_name
+brand
+resell
+site_name
+site_link
+site_price
+pid
