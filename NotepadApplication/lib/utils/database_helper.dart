@@ -85,7 +85,6 @@ class DatabaseHelper{
     return result;
   }
 
-
   // get the list of Map<String, dynamic> and convert it to List<Note>
   Future<List<Note>> getNoteList() async{
     var noteMapList = await getNoteMapList(); // get map list from db

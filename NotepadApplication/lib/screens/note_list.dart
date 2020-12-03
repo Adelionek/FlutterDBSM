@@ -67,8 +67,8 @@ class _NoteListState extends State<NoteList> {
               },
             ),
             onTap: (){
-              navigateToLogin();
-              //navigateToDetail(this.noteList[position],'Edit note');
+
+              navigateToDetail(this.noteList[position],'Edit note');
             },
           )
         );
@@ -129,17 +129,7 @@ class _NoteListState extends State<NoteList> {
     }
   }
 
-  void navigateToLogin() async {
-    debugPrint("ListTitle clicked");
-    bool result = await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => MyLogin()),
-    );
-    if (result == true){
-      updateListView();
-    }
 
-  }
 
 
   void updateListView(){

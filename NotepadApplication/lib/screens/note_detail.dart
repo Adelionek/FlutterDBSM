@@ -1,9 +1,12 @@
+import 'package:NotepadApplication/encryption.dart';
+import 'package:NotepadApplication/screens/login.dart';
 import 'package:NotepadApplication/screens/note_list.dart';
 import 'package:NotepadApplication/utils/database_helper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:NotepadApplication/models/note.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:encrypt/encrypt.dart' as encrypt;
 
 class NoteDetail extends StatefulWidget {
   final String appBarTitle;
@@ -13,7 +16,8 @@ class NoteDetail extends StatefulWidget {
 
   @override
   // need to pass values to create
-  _NoteDetailState createState() => _NoteDetailState(this.note, this.appBarTitle);
+  _NoteDetailState createState() =>
+      _NoteDetailState(this.note, this.appBarTitle);
 }
 
 class _NoteDetailState extends State<NoteDetail> {
@@ -162,18 +166,41 @@ class _NoteDetailState extends State<NoteDetail> {
                               textScaleFactor: 1.5,
                             ),
                             onPressed: () {
-                              if (_formKey.currentState.validate()){
+                              if (_formKey.currentState.validate()) {
                                 setState(() {
                                   debugPrint("Delete button clicked");
                                   _delete();
                                 });
                               }
-
                             },
                           ))
                         ],
                       ),
-                    )
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        RaisedButton(
+                          color: Colors.red[600],
+                          textColor: Colors.white,
+                          onPressed: () {
+                            // CODE TO ENCRYPT
+                          },
+                          child: Text("Encrypt"),
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        RaisedButton(
+                          color: Colors.green[500],
+                          textColor: Colors.white,
+                          onPressed: () {
+                            navigateToLogin();
+                          },
+                          child: Text("Decrypt"),
+                        ),
+                      ],
+                    ),
                   ],
                 )),
           ),
@@ -213,11 +240,13 @@ class _NoteDetailState extends State<NoteDetail> {
 
   //helper functions to update title
   void updateTitle() {
+
     note.title = titleController.text;
   }
 
   //helper functions to update description
   void updateDescription() {
+
     note.description = descriptionController.text;
   }
 
@@ -225,6 +254,12 @@ class _NoteDetailState extends State<NoteDetail> {
     moveToLastScreen();
     note.date = DateFormat.yMMMd().format(DateTime.now());
     int result;
+    var encrypted = MyEncryptionDecryption.encryptAES(descriptionController.text);
+
+    var bytes = encrypted.base64;
+    print(MyEncryptionDecryption.decryptAES(bytes));
+    print(encrypted is encrypt.Encrypted ? encrypted.base64 : encrypted);
+
     if (note.id != null) {
       //update note
       result = await helper.updateNote(note);
@@ -254,6 +289,14 @@ class _NoteDetailState extends State<NoteDetail> {
     } else {
       _showAlertDialog('Status', 'Problem with deleting note');
     }
+  }
+
+  void navigateToLogin() async {
+    debugPrint("ListTitle clicked");
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => MyLogin()),
+    );
   }
 
   void _showAlertDialog(String title, String message) {

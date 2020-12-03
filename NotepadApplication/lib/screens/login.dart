@@ -29,11 +29,15 @@ class _MyLogin extends State<MyLogin> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Text(
-                  'Welcome',
-                  style: Theme.of(context).textTheme.headline3,
-                ),
+                padding: const EdgeInsets.all(30.0),
+
+                  child: Text(
+                    'Please provide username and password to open note',
+                    style: Theme.of(context).textTheme.headline5,
+                    textAlign: TextAlign.center,
+
+                  ),
+
               ),
               TextField(
                 decoration: InputDecoration(
