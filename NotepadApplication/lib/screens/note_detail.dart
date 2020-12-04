@@ -24,6 +24,24 @@ class _NoteDetailState extends State<NoteDetail> {
   String appBarTitle;
   Note note;
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   var _formKey = GlobalKey<FormState>();
 
   static var _priorities = ['High', 'Low'];
@@ -186,7 +204,7 @@ class _NoteDetailState extends State<NoteDetail> {
                           onPressed: () {
                             // CODE TO ENCRYPT
                           },
-                          child: Text("Encrypt"),
+                          child: Text("SaveToEncrypedDB"),
                         ),
                         SizedBox(
                           width: 10,
@@ -197,7 +215,7 @@ class _NoteDetailState extends State<NoteDetail> {
                           onPressed: () {
                             navigateToLogin();
                           },
-                          child: Text("Decrypt"),
+                          child: Text("Delete"),
                         ),
                       ],
                     ),
@@ -254,11 +272,11 @@ class _NoteDetailState extends State<NoteDetail> {
     moveToLastScreen();
     note.date = DateFormat.yMMMd().format(DateTime.now());
     int result;
-    var encrypted = MyEncryptionDecryption.encryptAES(descriptionController.text);
+    //var encrypted = MyEncryptionDecryption.encryptAES(descriptionController.text);
 
-    var bytes = encrypted.base64;
-    print(MyEncryptionDecryption.decryptAES(bytes));
-    print(encrypted is encrypt.Encrypted ? encrypted.base64 : encrypted);
+    //var bytes = encrypted.base64;
+   // print(MyEncryptionDecryption.decryptAES(bytes));
+    //print(encrypted is encrypt.Encrypted ? encrypted.base64 : encrypted);
 
     if (note.id != null) {
       //update note
