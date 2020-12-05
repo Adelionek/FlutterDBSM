@@ -36,6 +36,19 @@ class HiveDbHelper {
 
 
   }
+
+  Future getHiveNoteMapList(var encryptionKey) async {
+
+    Box encryptedBox = await Hive.openBox('vaultBox', encryptionCipher: HiveAesCipher(encryptionKey));
+
+    var values = encryptedBox.values;
+    var noteMapList = encryptedBox.values;
+
+    return noteMapList;
+
+  }
+
+
   }
 
 

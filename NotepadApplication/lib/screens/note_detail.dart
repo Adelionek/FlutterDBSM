@@ -1,54 +1,46 @@
 import 'package:NotepadApplication/encryption.dart';
+import 'package:NotepadApplication/models/hive.model.dart';
 import 'package:NotepadApplication/screens/login.dart';
 import 'package:NotepadApplication/screens/note_list.dart';
 import 'package:NotepadApplication/utils/database_helper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:NotepadApplication/models/note.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 
 class NoteDetail extends StatefulWidget {
   final String appBarTitle;
   final Note note;
+  final HiveNote hiveNote;
 
-  NoteDetail(this.note, this.appBarTitle);
+  NoteDetail(this.note, this.hiveNote, this.appBarTitle);
 
   @override
   // need to pass values to create
   _NoteDetailState createState() =>
-      _NoteDetailState(this.note, this.appBarTitle);
+      _NoteDetailState(this.note, this.hiveNote, this.appBarTitle);
 }
 
 class _NoteDetailState extends State<NoteDetail> {
   String appBarTitle;
   Note note;
+  HiveNote hiveNote;
 
+  Box<HiveNote> encryptedBox;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  @override
+  void initState(){
+    super.initState();
+    encryptedBox = Hive.box('vaultBox');
+  }
 
   var _formKey = GlobalKey<FormState>();
-
   static var _priorities = ['High', 'Low'];
-
   DatabaseHelper helper = DatabaseHelper();
 
-  _NoteDetailState(this.note, this.appBarTitle);
+  _NoteDetailState(this.note, this.hiveNote, this.appBarTitle);
 
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
@@ -57,8 +49,8 @@ class _NoteDetailState extends State<NoteDetail> {
   Widget build(BuildContext context) {
     TextStyle textStyle = Theme.of(context).textTheme.subtitle1;
 
-    titleController.text = note.title;
-    descriptionController.text = note.description;
+    titleController.text = hiveNote.title;
+    descriptionController.text = hiveNote.description;
 
     return WillPopScope(
         onWillPop: () {
@@ -114,6 +106,7 @@ class _NoteDetailState extends State<NoteDetail> {
                         onChanged: (value) {
                           debugPrint('Something changed in title text field');
                           updateTitle();
+                          updateHiveNoteTitle();
                         },
                         decoration: InputDecoration(
                             labelText: 'Title',
@@ -139,6 +132,7 @@ class _NoteDetailState extends State<NoteDetail> {
                           debugPrint(
                               'Something changed in description text field');
                           updateDescription();
+                          updateHiveNoteDescription();
                         },
                         decoration: InputDecoration(
                             labelText: 'Description',
@@ -166,7 +160,8 @@ class _NoteDetailState extends State<NoteDetail> {
                               if (_formKey.currentState.validate()) {
                                 setState(() {
                                   debugPrint("Save button clicked");
-                                  _save();
+                                  _saveHiveNote();
+                                  //_save();
                                 });
                               }
                             },
@@ -187,7 +182,8 @@ class _NoteDetailState extends State<NoteDetail> {
                               if (_formKey.currentState.validate()) {
                                 setState(() {
                                   debugPrint("Delete button clicked");
-                                  _delete();
+                                  _deleteHiveNote();
+                                  //_delete();
                                 });
                               }
                             },
@@ -262,21 +258,24 @@ class _NoteDetailState extends State<NoteDetail> {
     note.title = titleController.text;
   }
 
+  void updateHiveNoteTitle(){
+    hiveNote.title = titleController.text;
+  }
+
   //helper functions to update description
   void updateDescription() {
 
     note.description = descriptionController.text;
+  }
+  void updateHiveNoteDescription(){
+    hiveNote.description = titleController.text;
+
   }
 
   void _save() async {
     moveToLastScreen();
     note.date = DateFormat.yMMMd().format(DateTime.now());
     int result;
-    //var encrypted = MyEncryptionDecryption.encryptAES(descriptionController.text);
-
-    //var bytes = encrypted.base64;
-   // print(MyEncryptionDecryption.decryptAES(bytes));
-    //print(encrypted is encrypt.Encrypted ? encrypted.base64 : encrypted);
 
     if (note.id != null) {
       //update note
@@ -292,6 +291,47 @@ class _NoteDetailState extends State<NoteDetail> {
       _showAlertDialog('Status', 'Problem saving note');
     }
   }
+
+  void _saveHiveNote() {
+    moveToLastScreen();
+    int id = 0;
+    if (hiveNote.id == null) {
+      if (encryptedBox.isNotEmpty) {
+        id = encryptedBox.keys.last;
+        hiveNote.id = id + 1;
+      } else {
+        hiveNote.id = 0;
+      }
+      hiveNote.priority = 1;
+      hiveNote.title = titleController.text;
+      hiveNote.description = descriptionController.text;
+      hiveNote.date = DateFormat.yMMMd().format(DateTime.now());
+      encryptedBox.add(hiveNote);
+      print('HIVE NOTE ADDED!!');
+    }else{
+
+      hiveNote.priority = 1;
+      hiveNote.title = titleController.text;
+      hiveNote.description = descriptionController.text;
+      hiveNote.date = DateFormat.yMMMd().format(DateTime.now());
+      encryptedBox.putAt(hiveNote.id, hiveNote);
+      print('HIVE NOTE EDITED!!');
+    }
+
+  }
+
+
+  void _deleteHiveNote()  {
+    moveToLastScreen();
+    if (hiveNote.id == null) {
+      _showAlertDialog('Status', 'No Note was deleted');
+      return;
+    }else{
+      encryptedBox.deleteAt(hiveNote.id);
+      _showAlertDialog('Status', 'Note deleted Successfully');
+    }
+  }
+
 
   void _delete() async {
     moveToLastScreen();
@@ -324,4 +364,13 @@ class _NoteDetailState extends State<NoteDetail> {
     );
     showDialog(context: context, builder: (_) => alertDialog);
   }
+
+
+  void addHiveNote(HiveNote note){
+    Hive.box('vaultBox').add(note);
+  }
+
+
+
+
 }
