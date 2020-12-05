@@ -15,6 +15,7 @@ class NoteDetail extends StatefulWidget {
   final Note note;
   final HiveNote hiveNote;
 
+
   NoteDetail(this.note, this.hiveNote, this.appBarTitle);
 
   @override
@@ -27,6 +28,7 @@ class _NoteDetailState extends State<NoteDetail> {
   String appBarTitle;
   Note note;
   HiveNote hiveNote;
+  _NoteDetailState(this.note, this.hiveNote, this.appBarTitle);
 
   Box<HiveNote> encryptedBox;
 
@@ -40,7 +42,6 @@ class _NoteDetailState extends State<NoteDetail> {
   static var _priorities = ['High', 'Low'];
   DatabaseHelper helper = DatabaseHelper();
 
-  _NoteDetailState(this.note, this.hiveNote, this.appBarTitle);
 
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();

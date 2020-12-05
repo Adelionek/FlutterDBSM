@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:NotepadApplication/screens/login.dart';
 
 
 void main() async{
@@ -39,7 +40,7 @@ class MyApp extends StatelessWidget {
             if(snapshot.hasError)
               return Text('Error');
             else
-              return NoteList();
+              return MyLogin();
           }
           else
             return Scaffold();

@@ -19,12 +19,19 @@ import 'package:NotepadApplication/models/hive.model.dart';
 import 'dart:math';
 
 class NoteList extends StatefulWidget {
+  final String userName;
+
+  NoteList(this.userName);
+
   @override
-  _NoteListState createState() => _NoteListState();
+  _NoteListState createState() => _NoteListState(this.userName);
+
 }
 
 class _NoteListState extends State<NoteList> {
   Box<HiveNote> encryptedBox;
+  String userName;
+  _NoteListState(this.userName);
 
   // TODO change this
   static var encryptionKey;
