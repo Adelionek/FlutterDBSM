@@ -153,7 +153,7 @@ class _NoteListState extends State<NoteList> {
               trailing: GestureDetector(
                 child: Icon(Icons.delete, color: Colors.grey),
                 onTap: () {
-                  _delete(context, noteList[position]);
+                  _deleteHiveNote(context, hiveNoteList[position]);
                 },
               ),
               onTap: () {
@@ -201,12 +201,27 @@ class _NoteListState extends State<NoteList> {
     }
   }
 
-  void _deleteHiveNote(BuildContext context, HiveNote note){
-    int noteId = note.id;
-    encryptedBox.delete(noteId);
+  int findHiveNoteId(HiveNote note){
+    var passedNoteId = note.id;
+    int foundId = -1;
+    Map<dynamic, dynamic> raw = encryptedBox.toMap();
+    raw.forEach((key, value) {
+      print(key);
+      if(value.id.toString() == passedNoteId.toString()){
+        foundId = key;}
+    });
+    return foundId;
+  }
 
-    _showSnackBar(context, 'Note deleted successfully');
-    updateHiveListView();
+  void _deleteHiveNote(BuildContext context, HiveNote note) {
+    int key = findHiveNoteId(note);
+    if (key != -1){
+      encryptedBox.delete(key);
+      _showSnackBar(context, 'Note deleted successfully');
+      updateHiveListView();
+    }else{
+      _showSnackBar(context, 'Error while deleting note, check logs');
+    }
   }
 
   void _showSnackBar(BuildContext context, String message) {
@@ -250,6 +265,8 @@ class _NoteListState extends State<NoteList> {
         userNotes.add(note);
       }
     }
+
+
 
     setState(() {
       this.hiveNoteList = userNotes;

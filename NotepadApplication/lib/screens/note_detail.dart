@@ -192,30 +192,6 @@ class _NoteDetailState extends State<NoteDetail> {
                         ],
                       ),
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        RaisedButton(
-                          color: Colors.red[600],
-                          textColor: Colors.white,
-                          onPressed: () {
-                            // CODE TO ENCRYPT
-                          },
-                          child: Text("SaveToEncrypedDB"),
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        RaisedButton(
-                          color: Colors.green[500],
-                          textColor: Colors.white,
-                          onPressed: () {
-                            navigateToLogin();
-                          },
-                          child: Text("Delete"),
-                        ),
-                      ],
-                    ),
                   ],
                 )),
           ),
