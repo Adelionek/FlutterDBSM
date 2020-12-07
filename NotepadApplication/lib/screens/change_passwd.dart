@@ -1,20 +1,21 @@
 import 'dart:convert';
 
-import 'package:NotepadApplication/screens/change_passwd.dart';
 import 'package:NotepadApplication/screens/note_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:crypto/crypto.dart';
 import 'dart:convert';
 
-class MyLogin extends StatefulWidget {
+class ChangePasswd extends StatefulWidget {
   @override
-  _MyLogin createState() => _MyLogin();
+  _ChangePasswd createState() => _ChangePasswd();
 }
 
-class _MyLogin extends State<MyLogin> {
+class _ChangePasswd extends State<ChangePasswd> {
   final loginController = TextEditingController();
   final passwordController = TextEditingController();
+  final newpasswordController = TextEditingController();
+  final newpassword2Controller = TextEditingController();
 
   @override
   void dispose() {
@@ -36,8 +37,8 @@ class _MyLogin extends State<MyLogin> {
               Padding(
                 padding: const EdgeInsets.all(30.0),
                 child: Text(
-                  'Welcome',
-                  style: Theme.of(context).textTheme.headline2,
+                  'Change password',
+                  style: Theme.of(context).textTheme.headline5,
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -53,60 +54,50 @@ class _MyLogin extends State<MyLogin> {
                   ),
                   controller: passwordController,
                   obscureText: true),
-              SizedBox(
-                height: 24,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  RaisedButton(
-                    color: Colors.green,
-                    child: Text('ENTER'),
-                    onPressed: () async {
-                      String username = loginController.text;
-                      String password = passwordController.text;
-
-                      var isAuthorized = await _authUser(username, password);
-
-                      if (isAuthorized == 1) {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => NoteList(username)));
-
-                        //return NoteList();
-                      } else {
-                        _showAlertDialog('Status',
-                            'Wrong credentials');
-
-                      }
-                    },
+              TextField(
+                  decoration: InputDecoration(
+                    hintText: 'New password',
                   ),
-                  SizedBox(
-                    width: 10,
+                  controller: newpasswordController,
+                  obscureText: true),
+              TextField(
+                  decoration: InputDecoration(
+                    hintText: 'Confirm new password',
                   ),
-                  RaisedButton(
-                    color: Colors.yellow,
-                    child: Text('Register'),
-                    onPressed: () {
-                      if (validatePassword(passwordController.text) == false) {
-                        _showAlertDialog('Status',
-                            'Password must be at least 15 char long :)');
-                      } else {
-                        _registerUser(
-                            loginController.text, passwordController.text);
-                      }
-                      passwordController.clear();
-                    },
-                  ),
-                ],
-              ),
+                  controller: newpassword2Controller,
+                  obscureText: true),
+              SizedBox(height: 20),
               RaisedButton(
                 color: Colors.purple[500],
                 textColor: Colors.white,
-                onPressed: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => ChangePasswd()));
+                shape: RoundedRectangleBorder(
+                    borderRadius: new BorderRadius.circular(30.0)),
+                onPressed: () async {
+                  var isAuthorized = await _authUser(
+                      this.loginController.text, this.passwordController.text);
+                  if (isAuthorized == 0) {
+                    _showAlertDialog('Status', 'Wrong username or password');
+                    return;
+                  }
+
+                  if (validatePassword(passwordController.text) == false) {
+                    _showAlertDialog(
+                        'Status', 'Password must be at least 15 char long :)');
+                    return;
+                  }
+
+                  if (newpasswordController.text !=
+                      newpassword2Controller.text) {
+                    newpassword2Controller.clear();
+                    newpasswordController.clear();
+                    _showAlertDialog('Status', 'New passwrods are not equal');
+                    return;
+                  }
+
+                  _changeUserPassword(
+                      this.loginController.text, this.passwordController.text);
+                  Navigator.pop(context, true);
+
                 },
                 child: Text("Change user password"),
               ),
@@ -125,18 +116,13 @@ class _MyLogin extends State<MyLogin> {
     showDialog(context: context, builder: (_) => alertDialog);
   }
 
-  void _registerUser(String username, String password) async {
+  void _changeUserPassword(String username, String newPassword) async {
     final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
-    var bytes = utf8.encode(password); // data being hashed
+    var bytes = utf8.encode(newPassword); // data being hashed
     var password_hashed = sha256.convert(bytes).toString();
-    var containsEncryptionKey = await secureStorage.containsKey(key: username);
 
-    if (containsEncryptionKey) {
-      _showAlertDialog('Status', 'Username already taken');
-    } else {
-      await secureStorage.write(key: username, value: password_hashed);
-      _showAlertDialog('Status', 'User created successfully');
-    }
+    await secureStorage.write(key: username, value: password_hashed);
+    _showAlertDialog('Status', 'Password chanegd successfully');
   }
 
   Future<int> _authUser(String username, String password) async {
@@ -167,3 +153,9 @@ class _MyLogin extends State<MyLogin> {
     }
   }
 }
+
+//
+// Navigator.push(
+// context,
+// MaterialPageRoute(
+// builder: (context) => NoteList(username)));
