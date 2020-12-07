@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:NotepadApplication/screens/note_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:crypto/crypto.dart';
+import 'dart:convert';
 
 class MyLogin extends StatefulWidget {
   @override
@@ -49,6 +51,7 @@ class _MyLogin extends State<MyLogin> {
                   hintText: 'Password',
                 ),
                 controller: passwordController,
+                obscureText: true
               ),
               SizedBox(
                 height: 24,
@@ -59,13 +62,14 @@ class _MyLogin extends State<MyLogin> {
                   RaisedButton(
                     color: Colors.green,
                     child: Text('ENTER'),
-                    onPressed: () {
-                      print(loginController.text);
-                      print(passwordController.text);
+                    onPressed: () async {
                       String username = loginController.text;
+                      String password = loginController.text;
 
-                      if (loginController.text == 'admin' &&
-                          passwordController.text == 'admin') {
+                      var isAuthorized = await _authUser(username, password);
+
+
+                      if (isAuthorized == 1) {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -73,10 +77,7 @@ class _MyLogin extends State<MyLogin> {
 
                         //return NoteList();
                       } else {
-                        loginController.clear();
-                        passwordController.clear();
-                        print(loginController.text);
-                        print(passwordController.text);
+
                       }
                     },
                   ),
@@ -115,15 +116,41 @@ class _MyLogin extends State<MyLogin> {
 
   void _registerUser(String username, String password) async {
     final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
+    var bytes = utf8.encode(password); // data being hashed
+    var password_hashed = sha256.convert(bytes).toString();
     var containsEncryptionKey = await secureStorage.containsKey(key: username);
+
 
     if (containsEncryptionKey){
       _showAlertDialog(
           'Status', 'Username already taken');
     }else{
-      await secureStorage.write(key: username, value: password);
+      await secureStorage.write(key: username, value: password_hashed);
       _showAlertDialog(
           'Status', 'User created successfully');
     }
   }
+
+  Future<int> _authUser(String username, String password) async {
+    final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
+    var containsEncryptionKey = await secureStorage.containsKey(key: username);
+
+    var bytes = utf8.encode(password); // data being hashed
+    var digest = sha256.convert(bytes).toString();
+
+    if (!containsEncryptionKey){
+      _showAlertDialog(
+          'Status', 'User dont exist');
+      return 0;
+    }else{
+      var userpass = await secureStorage.read(key: username);
+      if (userpass == digest){
+        return 1;
+      }else{
+        return 0;
+      }
+    }
+  }
+
+
 }

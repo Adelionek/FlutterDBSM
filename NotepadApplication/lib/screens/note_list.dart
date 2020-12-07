@@ -25,12 +25,12 @@ class NoteList extends StatefulWidget {
 
   @override
   _NoteListState createState() => _NoteListState(this.userName);
-
 }
 
 class _NoteListState extends State<NoteList> {
   Box<HiveNote> encryptedBox;
   String userName;
+
   _NoteListState(this.userName);
 
   // TODO change this
@@ -42,22 +42,6 @@ class _NoteListState extends State<NoteList> {
     encryptedBox = Hive.box('vaultBox');
     print(encryptedBox.length);
   }
-
-  // Future openBox() async {
-  //
-  //   final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
-  //   var containsEncryptionKey = await secureStorage.containsKey(key: 'key');
-  //   if (!containsEncryptionKey) {
-  //     var key = Hive.generateSecureKey();
-  //     print("Generating key");
-  //     await secureStorage.write(key: 'key', value: base64UrlEncode(key));
-  //   }
-  //
-  //   encryptionKey = base64Url.decode(await secureStorage.read(key: 'key'));
-  //   encryptedBox = await Hive.openBox('vaultBox', encryptionCipher: HiveAesCipher(encryptionKey));
-  //
-  //   return;
-  // }
 
   DatabaseHelper databaseHelper = DatabaseHelper();
   HiveDbHelper hiveDbHelper = HiveDbHelper();
@@ -79,9 +63,7 @@ class _NoteListState extends State<NoteList> {
       hiveNoteList = List<HiveNote>();
       updateHiveListView();
       print('count from 2nd functoin:$count');
-
     }
-
 
     return Scaffold(
       appBar: AppBar(
@@ -99,8 +81,8 @@ class _NoteListState extends State<NoteList> {
         onPressed: () {
           navigateToDetail(
               Note('', '', 2),
-              HiveNote(
-                  null, '', DateFormat.yMMMd().format(DateTime.now()), 1, ''),
+              HiveNote(null, '', DateFormat.yMMMd().format(DateTime.now()), 1,
+                  userName, ''),
               'Add note');
         },
         tooltip: 'Add note',
@@ -113,7 +95,6 @@ class _NoteListState extends State<NoteList> {
     return ListView.builder(
         itemCount: count,
         itemBuilder: (context, index) {
-
           Map<dynamic, dynamic> raw = encryptedBox.toMap();
 
           return Card(
@@ -130,14 +111,18 @@ class _NoteListState extends State<NoteList> {
                 child: Icon(Icons.delete, color: Colors.grey),
                 // ON TAP OF DELETE ICON
                 onTap: () {
-                  //_delete(context, noteList[position]);
+                  print(hiveNoteList);
+                  print(encryptedBox.toMap());
+                  _deleteHiveNote(context, hiveNoteList[index]);
+                  print(encryptedBox.toMap());
+
                 },
               ),
 
               // ON TAP OF LISTED NOTE
               onTap: () {
-
-                navigateToDetail(this.noteList[0], hiveNoteList[index], 'Edit note');
+                navigateToDetail(
+                    this.noteList[0], hiveNoteList[index], 'Edit note');
               },
             ),
           );
@@ -216,6 +201,14 @@ class _NoteListState extends State<NoteList> {
     }
   }
 
+  void _deleteHiveNote(BuildContext context, HiveNote note){
+    int noteId = note.id;
+    encryptedBox.delete(noteId);
+
+    _showSnackBar(context, 'Note deleted successfully');
+    updateHiveListView();
+  }
+
   void _showSnackBar(BuildContext context, String message) {
     final snackBar = SnackBar(content: Text(message));
     Scaffold.of(context).showSnackBar(snackBar);
@@ -246,18 +239,22 @@ class _NoteListState extends State<NoteList> {
     });
   }
 
-  void updateHiveListView() async{
-
+  void updateHiveListView() async {
+    List<HiveNote> userNotes = [];
     Map<dynamic, dynamic> raw = encryptedBox.toMap();
     List<HiveNote> hiveList = raw.values.toList();
+
+    for (var i = 0; i < hiveList.length; i++) {
+      HiveNote note = hiveList[i];
+      if (note.userName == this.userName) {
+        userNotes.add(note);
+      }
+    }
+
     setState(() {
-      this.hiveNoteList = hiveList;
-      this.count = hiveList.length;
+      this.hiveNoteList = userNotes;
+      this.count = userNotes.length;
     });
-
-
-
-
   }
 
   ListView _buildListView() {
@@ -288,20 +285,5 @@ class _NoteListState extends State<NoteList> {
   Future<List<HiveNote>> _getHiveNoteMapList() async {
     var noteMapList = await hiveDbHelper.getHiveNoteMapList(encryptionKey);
     return noteMapList;
-  }
-
-  void putData() {
-    //encryptedBox.put('name2', 'value2');
-    //encryptedBox.add('value auto index');
-  }
-
-  void getdata() {
-    // String name = encryptedBox.get('name2');
-    //   var values = encryptedBox.values;
-    // var map = encryptedBox.toMap();
-
-    // print(name);
-
-    // print(map);
   }
 }

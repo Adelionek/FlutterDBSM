@@ -17,9 +17,16 @@ class HiveNote {
   int priority;
 
   @HiveField(4)
+  String userName;
+
+  @HiveField(5)
   String description;
 
 
-  HiveNote(this.id, this.title, this.date, this.priority, [this.description]);
-
+  HiveNote(this.id,
+      this.title,
+      this.date,
+      this.priority,
+      this.userName,
+      [this.description]);
 }

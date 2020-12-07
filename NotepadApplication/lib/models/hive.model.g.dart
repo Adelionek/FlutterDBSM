@@ -22,13 +22,14 @@ class HiveNoteAdapter extends TypeAdapter<HiveNote> {
       fields[2] as String,
       fields[3] as int,
       fields[4] as String,
+      fields[5] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, HiveNote obj) {
     writer
-      ..writeByte(5)
+      ..writeByte(6)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -38,6 +39,8 @@ class HiveNoteAdapter extends TypeAdapter<HiveNote> {
       ..writeByte(3)
       ..write(obj.priority)
       ..writeByte(4)
+      ..write(obj.userName)
+      ..writeByte(5)
       ..write(obj.description);
   }
 
