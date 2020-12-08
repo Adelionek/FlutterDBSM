@@ -69,6 +69,8 @@ class _MyLogin extends State<MyLogin> {
                       var isAuthorized = await _authUser(username, password);
 
                       if (isAuthorized == 1) {
+                        passwordController.clear();
+                        loginController.clear();
                         Navigator.push(
                             context,
                             MaterialPageRoute(

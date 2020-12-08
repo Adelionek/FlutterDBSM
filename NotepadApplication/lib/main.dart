@@ -20,8 +20,14 @@ void main() async{
 
 
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   var encryptionKey;
+
   Box<HiveNote> encryptedBox;
 
   @override
@@ -48,9 +54,11 @@ class MyApp extends StatelessWidget {
 
       ),
     );
+
+
+
+
   }
-
-
 
   Future openBox() async {
 
@@ -67,6 +75,12 @@ class MyApp extends StatelessWidget {
     //encryptedBox.clear();
 
     return;
+  }
+
+  @override
+  void dispose() {
+    Hive.close();
+    super.dispose();
   }
 
 }

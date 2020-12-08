@@ -111,11 +111,7 @@ class _NoteListState extends State<NoteList> {
                 child: Icon(Icons.delete, color: Colors.grey),
                 // ON TAP OF DELETE ICON
                 onTap: () {
-                  print(hiveNoteList);
-                  print(encryptedBox.toMap());
                   _deleteHiveNote(context, hiveNoteList[index]);
-                  print(encryptedBox.toMap());
-
                 },
               ),
 
@@ -206,7 +202,6 @@ class _NoteListState extends State<NoteList> {
     int foundId = -1;
     Map<dynamic, dynamic> raw = encryptedBox.toMap();
     raw.forEach((key, value) {
-      print(key);
       if(value.id.toString() == passedNoteId.toString()){
         foundId = key;}
     });
