@@ -44,7 +44,7 @@ class _NoteListState extends State<NoteList> {
   }
 
   DatabaseHelper databaseHelper = DatabaseHelper();
-  HiveDbHelper hiveDbHelper = HiveDbHelper();
+  //HiveDbHelper hiveDbHelper = HiveDbHelper();
   List<Note> noteList;
   List<HiveNote> hiveNoteList;
   HiveNote hiveNote;
@@ -289,13 +289,13 @@ class _NoteListState extends State<NoteList> {
     return encryptionKey;
   }
 
-  Future<Map<dynamic, dynamic>> _getNotes() async {
-    var notes = await hiveDbHelper.openBox(encryptionKey);
-    return notes;
-  }
+  // Future<Map<dynamic, dynamic>> _getNotes() async {
+  //   var notes = await hiveDbHelper.openBox(encryptionKey);
+  //   return notes;
+  // }
 
-  Future<List<HiveNote>> _getHiveNoteMapList() async {
-    var noteMapList = await hiveDbHelper.getHiveNoteMapList(encryptionKey);
-    return noteMapList;
-  }
+//   Future<List<HiveNote>> _getHiveNoteMapList() async {
+//     var noteMapList = await hiveDbHelper.getHiveNoteMapList(encryptionKey);
+//     return noteMapList;
+//   }
 }

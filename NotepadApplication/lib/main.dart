@@ -18,17 +18,14 @@ void main() async{
   runApp(MyApp());
 }
 
-
-
 class MyApp extends StatefulWidget {
   @override
   _MyAppState createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
-  var encryptionKey;
-
-  Box<HiveNote> encryptedBox;
+  //var encryptionKey;
+  //Box<HiveNote> encryptedBox;
 
   @override
   Widget build(BuildContext context) {
@@ -39,48 +36,28 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData(
         primarySwatch: Colors.deepPurple
       ),
-      home: FutureBuilder(
-        future: openBox(),
-        builder: (BuildContext context, AsyncSnapshot snapshot){
-          if(snapshot.connectionState == ConnectionState.done){
-            if(snapshot.hasError)
-              return Text('Error');
-            else
-              return MyLogin();
-          }
-          else
-            return Scaffold();
-        },
 
-      ),
+      home: MyLogin(),
+
+
+      // home: FutureBuilder(
+      //   future: openBox(),
+      //   builder: (BuildContext context, AsyncSnapshot snapshot){
+      //     if(snapshot.connectionState == ConnectionState.done){
+      //       if(snapshot.hasError)
+      //         return Text('Error');
+      //       else
+      //         return MyLogin();
+      //     }
+      //     else
+      //       return Scaffold();
+      //   },
+      //
+      // ),
     );
-
-
-
-
   }
-
-  Future openBox() async {
-
-    final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
-    var containsEncryptionKey = await secureStorage.containsKey(key: 'key');
-    if (!containsEncryptionKey) {
-      var key = Hive.generateSecureKey();
-      print("Generating key");
-      await secureStorage.write(key: 'key', value: base64UrlEncode(key));
-    }
-    encryptionKey = base64Url.decode(await secureStorage.read(key: 'key'));
-
-    encryptedBox = await Hive.openBox('vaultBox', encryptionCipher: HiveAesCipher(encryptionKey));
-    //encryptedBox.clear();
-
-    return;
-  }
-
   @override
   void dispose() {
     Hive.close();
     super.dispose();
-  }
-
-}
+  }}

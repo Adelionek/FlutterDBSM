@@ -146,7 +146,7 @@ class _ChangePasswd extends State<ChangePasswd> {
   }
 
   bool validatePassword(String password) {
-    if (password.length < 15) {
+    if (password.length < 10) {
       return false;
     } else {
       return true;

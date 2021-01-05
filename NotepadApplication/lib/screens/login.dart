@@ -1,11 +1,14 @@
 import 'dart:convert';
 
+import 'package:NotepadApplication/models/hive.model.dart';
 import 'package:NotepadApplication/screens/change_passwd.dart';
 import 'package:NotepadApplication/screens/note_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:crypto/crypto.dart';
 import 'dart:convert';
+
+import 'package:hive/hive.dart';
 
 class MyLogin extends StatefulWidget {
   @override
@@ -16,13 +19,8 @@ class _MyLogin extends State<MyLogin> {
   final loginController = TextEditingController();
   final passwordController = TextEditingController();
 
-  @override
-  void dispose() {
-    // Clean up the controller when the widget is disposed.
-    loginController.dispose();
-    passwordController.dispose();
-    super.dispose();
-  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -69,6 +67,7 @@ class _MyLogin extends State<MyLogin> {
                       var isAuthorized = await _authUser(username, password);
 
                       if (isAuthorized == 1) {
+                        await openBox();
                         passwordController.clear();
                         loginController.clear();
                         Navigator.push(
@@ -78,9 +77,7 @@ class _MyLogin extends State<MyLogin> {
 
                         //return NoteList();
                       } else {
-                        _showAlertDialog('Status',
-                            'Wrong credentials');
-
+                        _showAlertDialog('Status', 'Wrong credentials');
                       }
                     },
                   ),
@@ -141,6 +138,23 @@ class _MyLogin extends State<MyLogin> {
     }
   }
 
+  Future openBox() async {
+    final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
+    var containsEncryptionKey = await secureStorage.containsKey(key: 'key');
+    if (!containsEncryptionKey) {
+      var key = Hive.generateSecureKey();
+      print("Generating key");
+      await secureStorage.write(key: 'key', value: base64UrlEncode(key));
+    }
+
+    var encryptionKey = base64Url.decode(await secureStorage.read(key: 'key'));
+    if (!Hive.isBoxOpen('vaultBox')){
+      Box<HiveNote> encryptedBox = await Hive.openBox('vaultBox', encryptionCipher: HiveAesCipher(encryptionKey));
+    }
+
+    return;
+  }
+
   Future<int> _authUser(String username, String password) async {
     final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
     var containsEncryptionKey = await secureStorage.containsKey(key: username);
@@ -162,10 +176,13 @@ class _MyLogin extends State<MyLogin> {
   }
 
   bool validatePassword(String password) {
-    if (password.length < 15) {
+    if (password.length < 10) {
       return false;
     } else {
       return true;
     }
   }
+
+
+
 }
