@@ -26,12 +26,14 @@ dependencies:
     sdk: flutter
   sqflite: 1.3.2
   path_provider: 1.6.24
-  intl: 0.16.1
+  intl: 0.15.8
   encrypt: ^4.1.0
   hive: ^1.4.4+1
   hive_flutter: ^0.3.1
   flutter_secure_storage: ^3.3.5
   hive_generator: ^0.8.2
+  local_auth: ^0.4.0+1
+  is_lock_screen: ^1.0.0
 
 
   # The following adds the Cupertino Icons font to your application.

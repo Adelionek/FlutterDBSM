@@ -33,9 +33,6 @@ class _NoteListState extends State<NoteList> {
 
   _NoteListState(this.userName);
 
-  // TODO change this
-  static var encryptionKey;
-
   @override
   void initState() {
     super.initState();
@@ -44,6 +41,7 @@ class _NoteListState extends State<NoteList> {
   }
 
   DatabaseHelper databaseHelper = DatabaseHelper();
+
   //HiveDbHelper hiveDbHelper = HiveDbHelper();
   List<Note> noteList;
   List<HiveNote> hiveNoteList;
@@ -65,30 +63,36 @@ class _NoteListState extends State<NoteList> {
       print('count from 2nd functoin:$count');
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Notes"),
-      ),
 
-      //returns list view of notes
+    return WillPopScope(
+      onWillPop: () {
+        moveToLastScreen();
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text("Notes"),
+        ),
 
-      body: getHiveNoteListView(),
-      //body: _buildListView(),
+        //returns list view of notes
 
-      //body: getNoteListView(),
+        body: getHiveNoteListView(),
+        //body: _buildListView(),
 
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          navigateToDetail(
-              Note('', '', 2),
-              HiveNote(null, '', DateFormat.yMMMd().format(DateTime.now()), 1,
-                  userName, ''),
-              'Add note');
-        },
-        tooltip: 'Add note',
-        child: Icon(Icons.add),
-      ),
-    );
+        //body: getNoteListView(),
+
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            navigateToDetail(
+                Note('', '', 2),
+                HiveNote(null, '', DateFormat.yMMMd().format(DateTime.now()), 1,
+                    userName, ''),
+                'Add note');
+          },
+          tooltip: 'Add note',
+          child: Icon(Icons.add),
+        ),
+      ));
+
   }
 
   ListView getHiveNoteListView() {
@@ -141,7 +145,7 @@ class _NoteListState extends State<NoteList> {
             child: ListTile(
               leading: CircleAvatar(
                 backgroundColor:
-                    getPriorityColor(this.noteList[position].priority),
+                getPriorityColor(this.noteList[position].priority),
                 child: getPriorityIcon(this.noteList[position].priority),
               ),
               title: Text(this.noteList[position].title),
@@ -197,24 +201,25 @@ class _NoteListState extends State<NoteList> {
     }
   }
 
-  int findHiveNoteId(HiveNote note){
+  int findHiveNoteId(HiveNote note) {
     var passedNoteId = note.id;
     int foundId = -1;
     Map<dynamic, dynamic> raw = encryptedBox.toMap();
     raw.forEach((key, value) {
-      if(value.id.toString() == passedNoteId.toString()){
-        foundId = key;}
+      if (value.id.toString() == passedNoteId.toString()) {
+        foundId = key;
+      }
     });
     return foundId;
   }
 
   void _deleteHiveNote(BuildContext context, HiveNote note) {
     int key = findHiveNoteId(note);
-    if (key != -1){
+    if (key != -1) {
       encryptedBox.delete(key);
       _showSnackBar(context, 'Note deleted successfully');
       updateHiveListView();
-    }else{
+    } else {
       _showSnackBar(context, 'Error while deleting note, check logs');
     }
   }
@@ -227,7 +232,7 @@ class _NoteListState extends State<NoteList> {
   void navigateToDetail(Note note, HiveNote hiveNote, String title) async {
     debugPrint("ListTitle clicked");
     bool result =
-        await Navigator.push(context, MaterialPageRoute(builder: (context) {
+    await Navigator.push(context, MaterialPageRoute(builder: (context) {
       return NoteDetail(note, hiveNote, title);
     }));
     if (result == true) {
@@ -261,8 +266,6 @@ class _NoteListState extends State<NoteList> {
       }
     }
 
-
-
     setState(() {
       this.hiveNoteList = userNotes;
       this.count = userNotes.length;
@@ -289,13 +292,19 @@ class _NoteListState extends State<NoteList> {
     return encryptionKey;
   }
 
-  // Future<Map<dynamic, dynamic>> _getNotes() async {
-  //   var notes = await hiveDbHelper.openBox(encryptionKey);
-  //   return notes;
-  // }
+  void moveToLastScreen() {
+    // true will be passed to note_list, after adding/deleting note it will invoke updateListView()
+    Navigator.pop(context, true);
+  }
+
+// Future<Map<dynamic, dynamic>> _getNotes() async {
+//   var notes = await hiveDbHelper.openBox(encryptionKey);
+//   return notes;
+// }
 
 //   Future<List<HiveNote>> _getHiveNoteMapList() async {
 //     var noteMapList = await hiveDbHelper.getHiveNoteMapList(encryptionKey);
 //     return noteMapList;
 //   }
 }
+

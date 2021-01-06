@@ -10,6 +10,8 @@ import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 
+
+
 class NoteDetail extends StatefulWidget {
   final String appBarTitle;
   final Note note;
@@ -37,7 +39,6 @@ class _NoteDetailState extends State<NoteDetail> {
     super.initState();
     encryptedBox = Hive.box('vaultBox');
   }
-
   var _formKey = GlobalKey<FormState>();
   static var _priorities = ['High', 'Low'];
   DatabaseHelper helper = DatabaseHelper();
@@ -180,13 +181,11 @@ class _NoteDetailState extends State<NoteDetail> {
                               textScaleFactor: 1.5,
                             ),
                             onPressed: () {
-                              if (_formKey.currentState.validate()) {
-                                setState(() {
-                                  debugPrint("Delete button clicked");
-                                  _deleteHiveNote();
-                                  //_delete();
-                                });
-                              }
+                              setState(() {
+                                debugPrint("Delete button clicked");
+                                _deleteHiveNote();
+                                //_delete();
+                              });
                             },
                           ))
                         ],
@@ -214,7 +213,6 @@ class _NoteDetailState extends State<NoteDetail> {
         break;
     }
   }
-
   //converts int priority to int
   String getPriorityAsString(int value) {
     String priority;
@@ -297,15 +295,25 @@ class _NoteDetailState extends State<NoteDetail> {
 
   }
 
+  int findHiveNoteId(HiveNote note){
+    var passedNoteId = note.id;
+    int foundId = -1;
+    Map<dynamic, dynamic> raw = encryptedBox.toMap();
+    raw.forEach((key, value) {
+      if(value.id.toString() == passedNoteId.toString()){
+        foundId = key;}
+    });
+    return foundId;
+  }
 
   void _deleteHiveNote()  {
     moveToLastScreen();
-    if (hiveNote.id == null) {
-      _showAlertDialog('Status', 'No Note was deleted');
-      return;
+    int key = findHiveNoteId(hiveNote);
+    if (key != -1){
+      encryptedBox.delete(key);
+      _showAlertDialog('Status', 'Note deleted successfully');
     }else{
-      encryptedBox.deleteAt(hiveNote.id);
-      _showAlertDialog('Status', 'Note deleted Successfully');
+      _showAlertDialog('Status', 'Error while deleting note, check logs');
     }
   }
 
