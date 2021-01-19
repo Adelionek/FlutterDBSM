@@ -49,13 +49,12 @@ class _MyLogin extends State<MyLogin> {
                 controller: loginController,
               ),
 
-              // TODO UNCOMMENT FOR 3rd VERSION
-              // TextField(
-              //     decoration: InputDecoration(
-              //       hintText: 'Password',
-              //     ),
-              //     controller: passwordController,
-              //     obscureText: true),
+              TextField(
+                  decoration: InputDecoration(
+                    hintText: 'Password',
+                  ),
+                  controller: passwordController,
+                  obscureText: true),
 
               SizedBox(
                 height: 24,
@@ -66,7 +65,7 @@ class _MyLogin extends State<MyLogin> {
                   RaisedButton(
                       color: Colors.green,
                       child:
-                          Text(_isAuthenticating ? 'Cancel' : 'Authenticate'),
+                          Text(_isAuthenticating ? 'Cancel' : 'Login touchId'),
                       onPressed: () async {
 
 
@@ -108,13 +107,42 @@ class _MyLogin extends State<MyLogin> {
                     width: 10,
                   ),
                   RaisedButton(
-                    color: Colors.yellow,
-                    child: Text('Register'),
-                    onPressed: () {
-                      _registerUserWithFingerprint(loginController.text);
+                    color: Colors.green,
+                    child: Text('Login password'),
+                    onPressed: () async {
+                      passwordController.clear();
+                      loginController.clear();
+                      var username = loginController.text;
+                      var isAuth = await _authUser(username, passwordController.text);
+                      print(isAuth);
+                      if (isAuth){
+                        await openBox("vaultBox");
+                        passwordController.clear();
+                        loginController.clear();
+                        bool result = await
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => NoteList(username)));
+                        if (result){
+                          _authorized = 'Not Authorized';
+                        }
+                        //return NoteList();
+                      }
                     },
                   ),
+
                 ],
+              ),
+              RaisedButton(
+                color: Colors.yellow,
+                child: Text('Register'),
+                onPressed: () async {
+                  await getUsers();
+                // await _registerUser(loginController.text, passwordController.text);
+                // await getUsers();
+                  // _registerUserWithFingerprint(loginController.text);
+                },
               ),
               RaisedButton(
                 color: Colors.purple[500],
@@ -135,6 +163,15 @@ class _MyLogin extends State<MyLogin> {
   void _cancelAuthentication() {
     print(_authorized);
   }
+
+  Future<void> getUsers() async {
+  final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
+  //await secureStorage.deleteAll();
+  print(secureStorage.readAll());
+  //var users = await secureStorage.readAll();
+  //print(users.length);
+}
+
 
   Future<void> _checkBiometrics() async {
     bool canCheckBiometrics;
@@ -175,16 +212,16 @@ class _MyLogin extends State<MyLogin> {
     var containsEncryptionKey = await secureStorage.containsKey(key: username);
 
 
-    var bytes = utf8.encode(fid.toString()); // data being hashed
-    var digest = sha256.convert(bytes).toString();
+
 
 
     if (!containsEncryptionKey) {
       _showAlertDialog('Status', 'User dont exist');
       return 0;
     }else {
-      var userpass = await secureStorage.read(key: username);
-      if (userpass != digest) {
+      //var userpass = await secureStorage.read(key: username);
+      var userpass = await secureStorage.read(key: username+"Fng");
+      if (userpass != fid.toString()) {
         _showAlertDialog('Status', 'WrongTouchId');
         return 0;
       } else {
@@ -223,7 +260,7 @@ class _MyLogin extends State<MyLogin> {
     showDialog(context: context, builder: (_) => alertDialog);
   }
 
-  void _registerUser(String username, String password) async {
+  Future _registerUser(String username, String password) async {
     final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
     var bytes = utf8.encode(password); // data being hashed
     var password_hashed = sha256.convert(bytes).toString();
@@ -231,9 +268,19 @@ class _MyLogin extends State<MyLogin> {
 
     if (containsEncryptionKey) {
       _showAlertDialog('Status', 'Username already taken');
+      passwordController.clear();
+      loginController.clear();
     } else {
+    var users = await secureStorage.readAll();
+    print(users.length);
+
       await secureStorage.write(key: username, value: password_hashed);
+      await secureStorage.write(key: username + "Fng", value: (users.length+1).toString());
+
       _showAlertDialog('Status', 'User created successfully');
+    passwordController.clear();
+    loginController.clear();
+
     }
   }
 
@@ -299,22 +346,23 @@ class _MyLogin extends State<MyLogin> {
     return;
   }
 
-  Future<int> _authUser(String username, String password) async {
+  Future<bool> _authUser(String username, String password) async {
     final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
     var containsEncryptionKey = await secureStorage.containsKey(key: username);
+    print(containsEncryptionKey);
 
     var bytes = utf8.encode(password); // data being hashed
     var digest = sha256.convert(bytes).toString();
 
     if (!containsEncryptionKey) {
       _showAlertDialog('Status', 'User dont exist');
-      return 0;
+      return false;
     } else {
       var userpass = await secureStorage.read(key: username);
       if (userpass == digest) {
-        return 1;
+        return true;
       } else {
-        return 0;
+        return false;
       }
     }
   }
