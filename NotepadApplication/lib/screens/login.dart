@@ -110,11 +110,12 @@ class _MyLogin extends State<MyLogin> {
                     color: Colors.green,
                     child: Text('Login password'),
                     onPressed: () async {
+
+                      var username = loginController.text;
+                      var isAuth = await _authUser(loginController.text, passwordController.text);
+                      print(isAuth);
                       passwordController.clear();
                       loginController.clear();
-                      var username = loginController.text;
-                      var isAuth = await _authUser(username, passwordController.text);
-                      print(isAuth);
                       if (isAuth){
                         await openBox("vaultBox");
                         passwordController.clear();
@@ -138,8 +139,8 @@ class _MyLogin extends State<MyLogin> {
                 color: Colors.yellow,
                 child: Text('Register'),
                 onPressed: () async {
-                  await getUsers();
-                // await _registerUser(loginController.text, passwordController.text);
+                  //await getUsers();
+                await _registerUser(loginController.text, passwordController.text);
                 // await getUsers();
                   // _registerUserWithFingerprint(loginController.text);
                 },

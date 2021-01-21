@@ -121,8 +121,9 @@ class _NoteListState extends State<NoteList> {
 
               // ON TAP OF LISTED NOTE
               onTap: () {
+                Note note;
                 navigateToDetail(
-                    this.noteList[0], hiveNoteList[index], 'Edit note');
+                    note, hiveNoteList[index], 'Edit note');
               },
             ),
           );
