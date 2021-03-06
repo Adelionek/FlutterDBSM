@@ -83,7 +83,6 @@ class _NoteListState extends State<NoteList> {
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             navigateToDetail(
-                Note('', '', 2),
                 HiveNote(null, '', DateFormat.yMMMd().format(DateTime.now()), 1,
                     userName, ''),
                 'Add note');
@@ -122,8 +121,7 @@ class _NoteListState extends State<NoteList> {
               // ON TAP OF LISTED NOTE
               onTap: () {
                 Note note;
-                navigateToDetail(
-                    note, hiveNoteList[index], 'Edit note');
+                navigateToDetail(hiveNoteList[index], 'Edit note');
               },
             ),
           );
@@ -159,7 +157,7 @@ class _NoteListState extends State<NoteList> {
               ),
               onTap: () {
                 navigateToDetail(
-                    this.noteList[position], hiveNote, 'Edit note');
+                    hiveNote, 'Edit note');
               },
             ));
       },
@@ -230,11 +228,11 @@ class _NoteListState extends State<NoteList> {
     Scaffold.of(context).showSnackBar(snackBar);
   }
 
-  void navigateToDetail(Note note, HiveNote hiveNote, String title) async {
+  void navigateToDetail(HiveNote hiveNote, String title) async {
     debugPrint("ListTitle clicked");
     bool result =
     await Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return NoteDetail(note, hiveNote, title);
+      return NoteDetail(hiveNote, title);
     }));
     if (result == true) {
       //updateListView();

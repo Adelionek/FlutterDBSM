@@ -348,6 +348,10 @@ class _MyLogin extends State<MyLogin> {
   }
 
   Future<bool> _authUser(String username, String password) async {
+    if (await isLockScreen() == true) {
+      return false;
+    }
+
     final FlutterSecureStorage secureStorage = const FlutterSecureStorage();
     var containsEncryptionKey = await secureStorage.containsKey(key: username);
     print(containsEncryptionKey);

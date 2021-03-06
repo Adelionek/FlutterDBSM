@@ -14,23 +14,21 @@ import 'package:encrypt/encrypt.dart' as encrypt;
 
 class NoteDetail extends StatefulWidget {
   final String appBarTitle;
-  final Note note;
   final HiveNote hiveNote;
 
 
-  NoteDetail(this.note, this.hiveNote, this.appBarTitle);
+  NoteDetail(this.hiveNote, this.appBarTitle);
 
   @override
   // need to pass values to create
   _NoteDetailState createState() =>
-      _NoteDetailState(this.note, this.hiveNote, this.appBarTitle);
+      _NoteDetailState(this.hiveNote, this.appBarTitle);
 }
 
 class _NoteDetailState extends State<NoteDetail> {
   String appBarTitle;
-  Note note;
   HiveNote hiveNote;
-  _NoteDetailState(this.note, this.hiveNote, this.appBarTitle);
+  _NoteDetailState(this.hiveNote, this.appBarTitle);
 
   Box<HiveNote> encryptedBox;
 
@@ -83,7 +81,7 @@ class _NoteDetailState extends State<NoteDetail> {
                               child: Text(dropDownStringItem));
                         }).toList(),
                         style: textStyle,
-                        value: getPriorityAsString(note.priority),
+                        value: getPriorityAsString(1),
                         onChanged: (valueSelectedByUser) {
                           setState(() {
                             debugPrint('User selected $valueSelectedByUser');
@@ -107,7 +105,7 @@ class _NoteDetailState extends State<NoteDetail> {
                         style: textStyle,
                         onChanged: (value) {
                           debugPrint('Something changed in title text field');
-                          updateTitle();
+                          //updateTitle();
                           updateHiveNoteTitle();
                         },
                         decoration: InputDecoration(
@@ -133,7 +131,6 @@ class _NoteDetailState extends State<NoteDetail> {
                         onChanged: (value) {
                           debugPrint(
                               'Something changed in description text field');
-                          updateDescription();
                           updateHiveNoteDescription();
                         },
                         decoration: InputDecoration(
@@ -206,10 +203,10 @@ class _NoteDetailState extends State<NoteDetail> {
   void updatePriorityAsInt(String value) {
     switch (value) {
       case 'High':
-        note.priority = 1;
+        //note.priority = 1;
         break;
       case 'Low':
-        note.priority = 2;
+        //note.priority = 2;
         break;
     }
   }
@@ -228,44 +225,44 @@ class _NoteDetailState extends State<NoteDetail> {
   }
 
   //helper functions to update title
-  void updateTitle() {
-
-    note.title = titleController.text;
-  }
+  // void updateTitle() {
+  //
+  //   note.title = titleController.text;
+  // }
 
   void updateHiveNoteTitle(){
     hiveNote.title = titleController.text;
   }
 
   //helper functions to update description
-  void updateDescription() {
-
-    note.description = descriptionController.text;
-  }
+  // void updateDescription() {
+  //
+  //   note.description = descriptionController.text;
+  // }
   void updateHiveNoteDescription(){
     hiveNote.description = titleController.text;
 
   }
 
-  void _save() async {
-    moveToLastScreen();
-    note.date = DateFormat.yMMMd().format(DateTime.now());
-    int result;
-
-    if (note.id != null) {
-      //update note
-      result = await helper.updateNote(note);
-    } else {
-      // add new note
-      result = await helper.insertNote(note);
-    }
-
-    if (result != 0) {
-      _showAlertDialog('Status', 'Note saved Successfully');
-    } else {
-      _showAlertDialog('Status', 'Problem saving note');
-    }
-  }
+  // void _save() async {
+  //   moveToLastScreen();
+  //   note.date = DateFormat.yMMMd().format(DateTime.now());
+  //   int result;
+  //
+  //   if (note.id != null) {
+  //     //update note
+  //     result = await helper.updateNote(note);
+  //   } else {
+  //     // add new note
+  //     result = await helper.insertNote(note);
+  //   }
+  //
+  //   if (result != 0) {
+  //     _showAlertDialog('Status', 'Note saved Successfully');
+  //   } else {
+  //     _showAlertDialog('Status', 'Problem saving note');
+  //   }
+  // }
 
   void _saveHiveNote() {
     moveToLastScreen();
@@ -318,21 +315,21 @@ class _NoteDetailState extends State<NoteDetail> {
   }
 
 
-  void _delete() async {
-    moveToLastScreen();
-    if (note.id == null) {
-      //delete existing note
-      _showAlertDialog('Status', 'No Note was deleted');
-      return;
-    }
-    int result = await helper.deleteNote(note.id);
-
-    if (result != 0) {
-      _showAlertDialog('Status', 'Note deleted Successfully');
-    } else {
-      _showAlertDialog('Status', 'Problem with deleting note');
-    }
-  }
+  // void _delete() async {
+  //   moveToLastScreen();
+  //   if (note.id == null) {
+  //     //delete existing note
+  //     _showAlertDialog('Status', 'No Note was deleted');
+  //     return;
+  //   }
+  //   int result = await helper.deleteNote(note.id);
+  //
+  //   if (result != 0) {
+  //     _showAlertDialog('Status', 'Note deleted Successfully');
+  //   } else {
+  //     _showAlertDialog('Status', 'Problem with deleting note');
+  //   }
+  // }
 
   void navigateToLogin() async {
     debugPrint("ListTitle clicked");
